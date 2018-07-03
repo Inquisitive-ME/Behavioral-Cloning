@@ -21,6 +21,67 @@ def getImage(source_path):
 
 steering_correction = 0.25
 
+def addRow(line, images, measurements):
+    steering_center = float(line[3])
+    
+    #split between not steering and steering
+    if(steering_center ==0):
+        #no steering
+        pUseImage = 0.75
+        pIncludeSide = .8
+        pFlipSide = 0.0
+
+    else:
+        #steering
+        pUseImage = 1.0
+        pIncludeSide = 0.6
+        pFlipSide = 0.0
+        
+    #Include only a percentage of non-steering images
+    if(np.random.rand()>(1.0-pUseImage)):
+        measurements.append(steering_center)    
+                
+        center_image = getImage(line[0])
+        images.append(center_image)
+            
+        flipped_steer_center = -steering_center
+        measurements.append(flipped_steer_center)
+            
+        flipped_center_im = np.fliplr(center_image)
+        images.append(flipped_center_im)
+        
+    #Percentage of side images to include
+    if(np.random.rand()>(1.0-pIncludeSide)):
+        left_image = getImage(line[1])
+        right_image = getImage(line[2])
+
+        images.append(left_image)
+        images.append(right_image)
+        
+        steering_left = (steering_center + steering_correction)
+        steering_right = (steering_center - steering_correction)        
+
+        measurements.append(steering_left)
+        measurements.append(steering_right)
+            
+         #Percentage of time to include flipped side image
+        if(np.random.rand()>(1.0-pFlipSide)):
+            flipped_left_im = np.fliplr(left_image)
+            flipped_right_im = np.fliplr(right_image)
+
+            images.append(flipped_left_im)
+            images.append(flipped_right_im)
+
+            #flipped_steer_left = -steering_center + steering_correction
+            #flipped_steer_right = -steering_center - steering_correction
+
+            flipped_steer_left = -steering_left
+            flipped_steer_right = -steering_right
+
+            measurements.append(flipped_steer_left)
+            measurements.append(flipped_steer_right)
+
+
 #compiling data set without generator
 lines = []
 with open('data/driving_log.csv') as csvfile:
@@ -35,51 +96,7 @@ images = []
 measurements = []
 
 for line in lines:
-    #Add all center images
-    center_image = getImage(line[0])
-    images.append(center_image)
-        
-    #Add all steering angles for center images
-    steering_center = float(line[3])
-    measurements.append(steering_center)    
-    
-    #flip images that are not steering angle of 0
-    if(steering_center !=0):
-        flipped_center_im = np.fliplr(center_image)
-        images.append(flipped_center_im)
-        
-        flipped_steer_center = -steering_center
-        measurements.append(flipped_steer_center)
-    
-    #Add side images for 0 steering
-    else:
-        #Include random 50%
-        if(np.random.rand() >0.0):
-            left_image = getImage(line[1])
-            right_image = getImage(line[2])
-
-            images.append(left_image)
-            images.append(right_image)
-
-            steering_left = (steering_center + steering_correction)
-            steering_right = (steering_center - steering_correction)        
-
-            measurements.append(steering_left)
-            measurements.append(steering_right)
-    
-
-    #flipped_left_im = np.fliplr(left_image)
-    #flipped_right_im = np.fliplr(right_image)
-
-    #images.append(flipped_left_im)
-    #images.append(flipped_right_im)
-    
-    #flipped_steer_left = -steering_center + steering_correction
-    #flipped_steer_right = -steering_right - steering_correction
-            
-    #measurements.append(flipped_steer_left)
-    #measurements.append(flipped_steer_right)
-
+    addRow(line, images, measurements)
         
 
 X_train = np.array(images)
@@ -118,11 +135,11 @@ output=Dense(1)(FCL2)
 
 model = Model(inputs = input, outputs = output)
 model.compile(loss='mse', optimizer='adam')
-model.fit(X_train, y_train, validation_split = 0.2, shuffle=True, epochs = 3)
+model.fit(X_train, y_train, validation_split = 0.2, shuffle=True, epochs = 5)
 #model.fit_generator(train_generator, steps_per_epoch=len(train_samples)/3,
 #          validation_data=validation_generator, validation_steps=len(validation_samples)/3, epochs=2)
 
-model.summary()
+#model.summary()
 
 model.save('model.h5')
 print("SAVED MODEL")
