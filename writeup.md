@@ -85,10 +85,10 @@ Below is a table describing the layers of the architecture
 | dense_1 (Dense)	elu activation		| flatten_1		| (10)			| 1231370	|
 | dense_2 (Dense) 					| dense_1		| (1)				| 11			|
  
-============================================================================
-Total params: 1,738,933
-Trainable params: 1,738,933
-Non-trainable params: 0
+============================================================================<br>
+Total params: 1,738,933<br>
+Trainable params: 1,738,933<br>
+Non-trainable params: 0<br>
 __________________________________________________________________________________________________
 
 #### 2. Attempts to reduce overfitting in the model
@@ -210,7 +210,7 @@ Then I cropped the image by removing 50 pixels from the top and 20 from the bott
 
 Below is a picture of the original image, followed by a picture of a cropped image.
 
-![alt text][SideImage]
+![alt text][SideImage]<br>
 
 ![alt text][CroppedSideImage]
 
