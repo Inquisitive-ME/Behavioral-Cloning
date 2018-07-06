@@ -210,8 +210,10 @@ Then I cropped the image by removing 50 pixels from the top and 20 from the bott
 
 Below is a picture of the original image, followed by a picture of a cropped image.
 
-![alt text][SideImage]<br>
+original
+![alt text][SideImage]
 
+cropped
 ![alt text][CroppedSideImage]
 
 I also augmented the data by flipping some of the images as well as the angles thinking this would help to make the model more robust and also provide more training data.
